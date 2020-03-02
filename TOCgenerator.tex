@@ -1,0 +1,98 @@
+\documentclass[12pt]{article}
+%Vim command
+%:read page86par1.txt
+%First, we select a non-letter to temporarily ...
+%lines 1 to 5
+\catcode`\@=11
+\newcount\t@cnew\t@cnew=1
+\newcount\t@copage\newbox\t@cbox
+\newcount\tocpageno\tocpageno=-1
+\newbox\t@cboxtest\newdimen\t@ctestsize
+%lines 6 to 7
+\def\t@cstrut{{\vrule height8.5pt depth3.5pt
+    width0pt}%Esto es para poner un espacio en el interior de 
+             %las celdas de una tabla (v\'{e}ase el libro de Walter Mora:
+}            % Preparaci\'{o}n de textos cient\'{i}ficos en \LaTeX -algo as\'{i}-) 
+%Vim command
+%:read page87par1
+%lines 8 to 10
+\def\t@cfolio{\t@cstrut
+    \ifnum\tocpageno<0
+      \romannumeral-\tocpageno
+    \else
+      \number\tocpageno
+    \fi
+}
+%Now that we have our own TOC page numbering, we must provide a method for 
+%incrementing `tocpageno' the same way `pageno' is incremented.
+%lines 11 to 13
+\def\t@cadvpageno{
+    \ifnum\tocpageno<0
+      \global\advance\tocpageno by -1
+    \else
+      \global\advance\tocpageno by 1
+    \fi
+}
+%lines 14 to 17
+\def\tocref#1#2{
+    #1\t@ctest{\t@cstrut#2#1}
+    \t@cbanner\global\setbox\t@cbox=\vbox{
+                 \box\t@cbox\vbox{
+                   \line{
+                     \rm\t@cstrut{#2#1}~\dotfill~\folio
+                   }
+                 }
+              }
+}
+%lines 18 to 21
+\def\tocline#1{
+    \t@ctest{\t@cstrut#1}
+    \t@cbanner\global\setbox\t@cbox=\vbox{
+              \box\t@cbox\vbox{
+                \line{\rm\t@cstrut{#1}
+                }              
+              }
+    }          
+}
+%lines 22 to 23
+\def\t@cbanner{
+    \ifnum\t@cnew=1
+          \t@cstart
+    \fi
+    \ifnum\t@cnew=3
+          \t@cont
+    \fi
+}
+%lines 24 to 31
+\def\t@cstart{
+    \global\setbox\t@cbox=\vbox{
+      \centerline{\t@cstrut\bf Tabla de Contenidos}
+      \line{\tqcstrut\hfil} % blank line
+    }\global\t@cnew=2
+}
+\def\t@cont{
+    \global\setbox\t@cbox=\vbox{
+      \centerline{\t@cstrut Tabla de Contenidos (Continuaci\'{o}n)}
+    }\global\t@cnew=2
+}
+%lines 32 to 41
+\def\t@ctest#1{
+    \setbox\t@cboxtest=\vbox{
+      \line{#1\hss}
+    }
+    \t@ctestsize=\ht\t@cbox
+    \advance\t@ctestsize by\dp\t@cbox
+    \advance\t@ctestsize by\ht\t@cboxtest
+    \advance\t@ctestsize by\dp\t@cboxtest
+    \setbox\t@cboxtest=\vbox{
+      \line{\t@cfolio\hss}
+    }
+    \advance\t@ctestsize by\ht\t@cboxtest
+    \advance\t@ctestsize by\dp\t@cboxtest
+    \ifdim\t@ctestsize>\vsize
+      \tocgen\global\t@cnew=3
+    \fi
+}
+\begin{document}
+\section*{Dummy Section}
+\end{document}
